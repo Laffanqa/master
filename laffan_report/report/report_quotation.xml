@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="action_report_saleorder_inherit" model="ir.actions.report">
-        <field name="name">Quotation</field>
+        <field name="name">Quotation / Order</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">laffan_report.report_saleorder_inherit</field>
