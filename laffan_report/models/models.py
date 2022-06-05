@@ -10,11 +10,8 @@ class SalesReport(models.Model):
     project_id = fields.Many2one('project.project', string="Project")
 
     def action_view_invoice(self):
-        print("dsfsdgdgdgdfgd", self)
         res = super(SalesReport, self).action_view_invoice()
-        print("vvvvvvvvvvvvvvvvvvvvvvff", res)
         if res:
-            print("hhhbnhnhnnh")
             if res.get('account_manager', False):
                 res['account_manager'] = self.account_manager.id
             if res.get('project_id', False):
