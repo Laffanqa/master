@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_quotation" model="report.paperformat">
+        <field name="name">European A4 low margin</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">35</field>
+        <field name="margin_bottom">32</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">30</field>
+        <field name="dpi">80</field>
+    </record>
+
+
+    <record id="action_report_saleorder_inherit" model="ir.actions.report">
+        <field name="name">Quotation / Order</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">laffan_report.report_saleorder_inherit</field>
+        <field name="report_file">laffan_report.report_saleorder_inherit</field>
+        <field name="paperformat_id" ref="laffan_report.paperformat_quotation"/>
+        <field name="print_report_name">'Quotation'
+        </field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+
+    <template id="report_saleorder_document_inherit">
+        <template id="web_external_layout_inherit_quotation" inherit_id="web.internal_layout">
+            <t t-set="o" t-value="doc.with_context(lang=lang)"/>
+            <t t-if="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id"></t>
+            </t>
+            <t t-if="not o or not 'company_id' in o">
+                <t t-set="company" t-value="res_company"></t>
+            </t>
+            <xpath expr="//div[@class='header']" position="replace">
+                <div class="header">
+                    <div class="col-12 row">
+                        <div class="col-6 text-left">
+                            <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % to_text(company.logo)"
+                                 style="height:105px;width:400px;"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <div class="col-12" t-if="report_type == 'pdf'">
+                        <div class="text-center"
+                             style="font-size:12px;border-top: 1px solid #6989b7;margin-top:80px !important;">
+                            <font color="#6989b7">
+                                <span>
+                                    <t t-esc="company.street"/>
+                                </span>
+                                <span>
+                                    <t t-esc="company.street2"/>
+                                </span>&#160;
+                                <span>
+                                    <t t-esc="company.city"/>
+                                </span>&#160;
+                                <span>
+                                    <t t-esc="company.zip"/>
+                                </span>&#160;
+                                <span>
+                                    <t t-esc="company.phone"/>
+                                </span>&#160;
+                                  <span>
+                                    <t t-esc="company.mobile"/>
+                                </span>&#160;
+                                <span>
+                                    <i class="fa fa-envelope-o">
+                                        <t t-esc="company.email" class=""/>
+                                    </i>
+                                </span>&#160;
+                                <span>
+                                    <i class="fa-dribbble">
+                                        <t t-esc="company.website"/>
+                                    </i>
+                                </span>
+                            </font>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </template>
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <div class="col-12" style="font-size:20px;">
+                        <strong>
+                            <font color="#6989b7">
+                                <span>Quotations No:</span>
+                                <t t-esc="doc.name"/>
+                            </font>
+                        </strong>
+                    </div>
+                    <br/>
+                    <div class="col-12 row">
+                        <div class="col-6 text-left">
+                            <table width="100%;" style="padding:5px;">
+                                <tr>
+                                    <td width="40%" style="padding:5px;ffont-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Issued To :</font>
+                                        </strong>
+                                    </td>
+                                    <td width="70%;"
+                                        style="margin-left:-20px;padding:1px;font-size:14px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.partner_id.name"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:5px;ffont-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Address :</font>
+                                        </strong>
+                                    </td>
+                                    <td style="padding:5px;font-size:14px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <t t-if="doc.partner_id.street">
+                                            <font color="#000000"><t t-esc="doc.partner_id.street"/>,
+                                            </font>
+                                        </t>
+                                        <t t-if="doc.partner_id.street2">
+                                            <font color="#000000"><t t-esc="doc.partner_id.street2"/>,
+                                            </font>
+                                        </t>
+                                        <t t-if="doc.partner_id.city">
+                                            <font color="#000000">
+                                                <t t-esc="doc.partner_id.city"/>
+                                            </font>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:5px;ffont-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Telephone :</font>
+                                        </strong>
+                                    </td>
+                                    <td style="font-size:14px;padding:5px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.partner_id.phone"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:5px;ffont-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Contact person :</font>
+                                        </strong>
+                                    </td>
+                                    <td style="font-size:14px;padding:5px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.partner_id.name"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:5px;ffont-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Project :</font>
+                                        </strong>
+                                    </td>
+                                    <td style="padding:5px;font-size:14px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.project_id.name"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-6">
+                            <table>
+                                <tr>
+                                    <td width="40%" style="padding:5px;font-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Quotations Date :</font>
+                                        </strong>
+                                    </td>
+                                    <td width="80%"
+                                        style="padding:5px;font-size:14px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.date_order"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:5px;font-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Refs # :</font>
+                                        </strong>
+                                    </td>
+                                    <td style="padding:5px;font-size:14px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.source_id.name"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:5px;font-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Validity Date:</font>
+                                        </strong>
+                                    </td>
+                                    <td style="padding:5px;font-size:14px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.validity_date"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:5px;font-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Customer Refs:</font>
+                                        </strong>
+                                    </td>
+                                    <td width="150%"
+                                        style="padding:5px;font-size:14px;background-color:#ebf2f7;border:1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.client_order_ref"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:5px;font-size:14px;">
+                                        <strong>
+                                            <font color="#6989b7">Account Manager:</font>
+                                        </strong>
+                                    </td>
+                                    <td style="padding:5px;font-size:14px;background-color:#ebf2f7;border: 1px solid #ffffff !important;">
+                                        <font color="#000000">
+                                            <t t-esc="doc.account_manager.name"/>
+                                        </font>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <br/>
+
+                    <!-- Is there a discount on at least one line? -->
+                    <t t-set="display_discount" t-value="any(l.discount for l in doc.order_line)"/>
+
+                    <table class="table" style="border-color:white !important;font-size:14px;">
+                        <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                        <thead style="display: table-row-group;border-color:#6989b7 !important;">
+                            <tr style="border-color:#6989b7 !important;">
+                                <th name="th_description" class="text-left"
+                                    style="background-color:#6989b7;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                    <font color="#ffffff">
+                                        <strong>No</strong>
+                                    </font>
+                                </th>
+                                <th name="th_description" class="text-left"
+                                    style="background-color:#6989b7;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                    <font color="#ffffff">
+                                        <strong>Description</strong>
+                                    </font>
+                                </th>
+                                <th name="th_quantity" class="text-left"
+                                    style="background-color:#6989b7;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                    <font color="#ffffff">
+                                        <strong>QTY</strong>
+                                    </font>
+                                </th>
+                                <th name="th_priceunit" class="text-left" width="15%"
+                                    style="background-color:#6989b7;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                    <font color="#ffffff">
+                                        <strong>Unit Price</strong>
+                                    </font>
+                                </th>
+                                <th name="th_discount" t-if="display_discount"
+                                    style="background-color:#6989b7;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;"
+                                    class="text-left"
+                                    groups="product.group_discount_per_so_line">
+                                    <span>
+                                        <font color="#ffffff">
+                                            <strong>Disc.%</strong>
+                                        </font>
+                                    </span>
+                                </th>
+                                <th name="th_subtotal" class="text-left" width="10%"
+                                    style="background-color:#6989b7;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                    <span groups="account.group_show_line_subtotals_tax_excluded">
+                                        <font color="#ffffff">
+                                            <strong>Amount</strong>
+                                        </font>
+                                    </span>
+                                    <span groups="account.group_show_line_subtotals_tax_included">
+                                        <font color="#ffffff">
+                                            <strong>Total Price</strong>
+                                        </font>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+
+                            <t t-set="current_subtotal" t-value="0"/>
+                            <t t-set="i" t-value="1"/>
+                            <t t-foreach="doc.order_line" t-as="line">
+
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"
+                                   groups="account.group_show_line_subtotals_tax_excluded"/>
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_total"
+                                   groups="account.group_show_line_subtotals_tax_included"/>
+
+                                <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                    <t t-if="not line.display_type">
+                                        <td name="td_name"
+                                            style="border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                            <span t-esc="i"/>
+                                            <t t-set="i" t-value="i+1"/>
+                                        </td>
+                                        <td name="td_name"
+                                            style="border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td name="td_quantity" class="text-right"
+                                            style="border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                            <span t-field="line.product_uom_qty"/>
+                                        </td>
+                                        <td name="td_priceunit" class="text-right"
+                                            style="border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                            <span t-field="line.price_unit"/>
+                                        </td>
+                                        <td t-if="display_discount" class="text-right"
+                                            style="border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;"
+                                            groups="product.group_discount_per_so_line">
+                                            <span t-field="line.discount"/>
+                                        </td>
+                                        <td name="td_subtotal" class="text-right o_price_total"
+                                            style="border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                            <span t-field="line.price_subtotal"
+                                                  groups="account.group_show_line_subtotals_tax_excluded"/>
+                                            <span t-field="line.price_total"
+                                                  groups="account.group_show_line_subtotals_tax_included"/>
+                                        </td>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_section'">
+                                        <td colspan="99"
+                                            style="border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <t t-set="current_section" t-value="line"/>
+                                        <t t-set="current_subtotal" t-value="0"/>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_note'">
+                                        <td name="td_note_line" colspan="99" style="border-color:#6989b7 !important;">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                    </t>
+                                </tr>
+
+                                <t t-if="current_section and (line_last or doc.order_line[line_index+1].display_type == 'line_section')">
+                                    <tr class="is-subtotal text-right">
+                                        <td name="td_section_subtotal" colspan="99"
+                                            style="border-color:white !important;">
+                                            <strong class="mr16">Subtotal</strong>
+                                            <span
+                                                    t-esc="current_subtotal"
+                                                    t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'
+                                            />
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <tr>
+                                <td colspan="3"
+                                    style="background-color:#ffffff;border-color:#ffffff !important;border-right: 1px Solid #ffffff !important;border-left: 1px Solid #ffffff !important;border-top: 1px Solid #ffffff !important;border-bottom: 1px Solid #ffffff !important;">
+                                </td>
+                                <td
+                                        style="text-align:center;background-color:#6989b7;border-color:#ffffff !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #ffffff !important;border-top: 1px Solid #ffffff !important;border-bottom: 1px Solid #ffffff !important;">
+                                    <font color="#ffffff">
+                                        <strong>Total</strong>
+                                    </font>
+                                </td>
+                                <td style="text-align:right;background-color:#6989b7;border-color:#ffffff !important;border-right: 1px Solid #ffffff !important;border-left: 1px Solid #ffffff !important;border-top: 1px Solid #ffffff !important;border-bottom: 1px Solid #ffffff !important;">
+                                    <font color="#ffffff">
+                                        <t t-esc="current_subtotal"/>
+                                    </font>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div t-if="doc.signature" class="mt32 ml64 mr4" name="signature">
+                        <div class="offset-8">
+                            <strong>Signature</strong>
+                        </div>
+                        <div class="offset-8">
+                            <img t-att-src="image_data_uri(doc.signature)" style="max-height: 4cm; max-width: 8cm;"/>
+                        </div>
+                        <div class="offset-8 text-center">
+                            <p t-field="doc.signed_by"/>
+                        </div>
+                    </div>
+                    <div class="oe_structure"/>
+                    <p t-field="doc.note"/>
+                    <p t-if="not is_html_empty(doc.payment_term_id.note)">
+                        <span t-field="doc.payment_term_id.note"/>
+                    </p>
+                    <p id="fiscal_position_remark"
+                       t-if="doc.fiscal_position_id and not is_html_empty(doc.fiscal_position_id.sudo().note)">
+                        <strong>Fiscal Position Remark:</strong>
+                        <span t-field="doc.fiscal_position_id.sudo().note"/>
+                    </p>
+                    <div class="col-6">
+                        <aside id="info-block">
+                            <section class="file-marker">
+                                <div>
+                                    <div class="box-title">
+                                        <span style="font-color:#6989b7;">
+                                            <font color="#6989b7">
+                                                <strong>Payment Details</strong>
+                                            </font>
+                                        </span>
+                                    </div>
+                                    <t>
+                                        <table
+                                                name="invoice_line_table"
+                                                style="padding:5px;width:100%;">
+                                            <tbody>
+                                                <tr t-if="doc.company_id.beneficiary_name">
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <font color="#6989b7">
+                                                            <strong>Beneficiary Name</strong>
+                                                        </font>
+                                                    </td>
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <t t-esc="doc.company_id.beneficiary_name"/>
+                                                    </td>
+                                                </tr>
+                                                <tr t-if="company.iban">
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <font color="#6989b7">
+                                                            <strong>IBAN</strong>
+                                                        </font>
+                                                    </td>
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <t t-esc="doc.company_id.iban"/>
+                                                    </td>
+                                                </tr>
+                                                <tr t-if="company.swift_code">
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <font color="#6989b7">
+                                                            <strong>Swift Code</strong>
+                                                        </font>
+                                                    </td>
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <t t-esc="doc.company_id.swift_code"/>
+                                                    </td>
+                                                </tr>
+                                                <tr t-if="company.branch_address">
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <font color="#6989b7">
+                                                            <strong>Branch Address</strong>
+                                                        </font>
+                                                    </td>
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <t t-esc="doc.company_id.branch_address"/>
+                                                    </td>
+                                                </tr>
+                                                <tr t-if="company.currency_id">
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <font color="#6989b7">
+                                                            <strong>Currency</strong>
+                                                        </font>
+                                                    </td>
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <t t-esc="doc.company_id.currency_id.name"/>
+                                                    </td>
+                                                </tr>
+                                                <tr t-if="company.account_type">
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <font color="#6989b7">
+                                                            <strong>Account Type</strong>
+                                                        </font>
+                                                    </td>
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <t t-esc="doc.company_id.account_type"/>
+                                                    </td>
+                                                </tr>
+                                                <tr t-if="company.bank_name">
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <font color="#6989b7">
+                                                            <strong>Bank Name</strong>
+                                                        </font>
+                                                    </td>
+                                                    <td style="font-size:14px;padding:5px;border-color:#6989b7 !important;border-right: 1px Solid #6989b7 !important;border-left: 1px Solid #6989b7 !important;border-top: 1px Solid #6989b7 !important;border-bottom: 1px Solid #6989b7 !important;">
+                                                        <t t-esc="doc.company_id.bank_name"/>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </t>
+                                </div>
+                            </section>
+                        </aside>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+
+    <template id="laffan_report.report_saleorder_inherit">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="laffan_report.report_saleorder_document_inherit" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+
+    <record id="sale.action_report_saleorder" model="ir.actions.report">
+        <field name="name">Quotation / Order</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sale.report_saleorder</field>
+        <field name="report_file">sale.report_saleorder</field>
+        <field name="print_report_name">(object.state in ('draft', 'sent') and 'Quotation - %s' % (object.name)) or
+            'Order - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" eval="False"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>
